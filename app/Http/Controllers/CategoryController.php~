@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Requests;
+use App\Category;
+use Response;
+
+class CategoryController extends Controller
+{
+    public function index(){
+               
+                $category = Category::all();
+                 return Response::json(array(
+			    'error' => false,
+			    'message' =>  $category,
+			    'status_code' => 200
+               ));    
+		
+	}
+
+  // function for creating category
+   public function store(Request $request){
+		
+                $category = new Category;
+                $category->name = $request->name;
+                $category->parent = $request->parent;
+                $category->order = $request->order;
+                $category->created_at = date('Y-m-d');
+                                
+                $category->save();
+
+
+                return Response::json(array(
+			    'error' => false,
+			    'message' =>  'Category created successfully',
+			    'status_code' => 200
+               ));
+		
+	}
+
+  // function for updating category 
+
+  public function update(Request $request){
+		
+                $id = $request->id;
+                $category = Category::find($id);
+                $category->name = $request->name;
+                $category->parent = $request->parent;
+                $category->order = $request->order;
+                $category->created_at = date('Y-m-d');
+
+                return Response::json(array(
+			    'error' => false,
+			    'message' =>  'Category updated successfully',
+			    'status_code' => 200
+               ));
+		
+	}
+
+   // function for showing category by id
+
+   public function show($id){
+               
+                $category = Category::find($id);
+                $flag = is_numeric($id);
+              
+                if(!$flag){
+                 return Response::json(array(
+			    'error' => true,
+			    'category' => "category Id is not integer",
+			    'status_code' => 422
+               ));
+                }
+
+                 return Response::json(array(
+			    'error' => false,
+			    'category' => $category,
+			    'status_code' => 200
+               ));
+        }
+
+ // function for removing category
+  public function destroy($id){
+               
+                $category = Category::find($id);
+                $category->delete();
+               
+                DB::table('category')->where('parent', '=', $id)->delete();
+
+                return Response::json(array(
+			    'error' => false,
+			    'message' => 'Category deleted',
+			    'status_code' => 200
+               ));
+        }
+
+ // function for searching category by name 
+  public function categoryByName($name){
+               
+                $category = Category::where('name',$name)->get();
+                $flag = is_numeric($name);
+
+                if($flag){
+                 return Response::json(array(
+			    'error' => true,
+			    'category' => "category name is not string",
+			    'status_code' => 422
+                 ));
+                }
+
+                return Response::json(array(
+			    'error' => false,
+			    'category' => $category,
+			    'status_code' => 200
+               ));
+        }
+
+ // function for finding subcategory menu from parent menu id
+  public function subcategory($parentId){
+               
+                $category = Category::where('parent',$parentId)->get();
+                 return Response::json(array(
+			    'error' => false,
+			    'category' => $category,
+			    'status_code' => 200
+               ));
+        }
+
+}

@@ -1,0 +1,39 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the controller to call when that URI is requested.
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// route to show the login form
+Route::get('task1', array('uses' => 'HomeController@showLogin'));
+
+
+// route for interface
+Route::get('categorylist', array('uses' => 'ViewController@index'));
+Route::get('createcategory', array('uses' => 'ViewController@create'));
+Route::get('categoryupdate/{id}', array('uses' => 'ViewController@edit'));
+Route::post('storecategory', array('uses' => 'ViewController@store'))->name('store.category');
+Route::post('updatecategory', array('uses' => 'ViewController@update'))->name('update.category');
+Route::post('searchcategory', array('uses' => 'ViewController@search_by'))->name('search.category');
+Route::get('categorydelete/{id}', array('uses' => 'ViewController@destroy'));
+
+// route for category Api
+Route::group(['prefix' => 'api/v1/', 'middleware' => 'auth.basic'], function()
+{
+   Route::resource('category', 'CategoryController');
+   Route::get('categorytype/{name}', 'CategoryController@categoryByName');
+   Route::get('subcategory/{parentId}', 'CategoryController@subcategory');
+   
+});
+
